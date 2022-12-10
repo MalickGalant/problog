@@ -1,49 +1,142 @@
-  <!-- -->
-  <!doctype html>
-  <html ⚡ lang="en">
-    <head>
-     <meta charset="utf-8">
-     <title>Maliek News</title>
-     <script async src="https://cdn.ampproject.org/v0.js"></script>
-      <!-- ## Setup -->
-      <!-- Import the `amp-fx-flying-carpet` component in the header. -->
-    <script async custom-element="amp-fx-flying-carpet" src="https://cdn.ampproject.org/v0/amp-fx-flying-carpet-0.1.js"></script>
-    <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
-    <meta name="viewport" content="width=device-width">
+ <!--
+  ## Introduction
 
-    <link rel="canonical" href="<% canonical %>">
-    
-    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+  How to display ads in your AMP HTML files.
+--><!-- -->
+<!doctype html>
+<html ⚡ lang="en">
+<head>
+<meta charset="utf-8">
+  <title>amp-ad</title>
+  <script async src="https://cdn.ampproject.org/v0.js"></script>
+  <!-- ## Setup -->
+  <!-- Import the `amp-ad` component in the header. -->
+  <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+  <link rel="canonical" href="https://amp.dev/documentation/examples/components/amp-ad/index.html">
+  <meta name="viewport" content="width=device-width">
+  <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+  <!--
+        All additionally used AMP components must be imported in the header. Import `amp-social-share` for adding share buttons-->
+      <script async custom-element="amp-social-share" src="https://cdn.ampproject.org/v0/amp-social-share-0.1.js"></script>
+      <!-- Import `amp-iframe` to embed an interactive chart -->
+      <script async custom-element="amp-iframe" src="https://cdn.ampproject.org/v0/amp-iframe-0.1.js"></script>
+      <!-- Import `amp-carousel` to implement an image gallery -->
+      <script async custom-element="amp-carousel" src="https://cdn.ampproject.org/v0/amp-carousel-0.1.js"></script>
+      <!-- Import `amp-user-notification` to display a cookie notification -->
+      <script async custom-element="amp-user-notification" src="https://cdn.ampproject.org/v0/amp-user-notification-0.1.js"></script>
+      <!-- Import `amp-list` to get a fresh a list of related articles -->
+      <script async custom-element="amp-list" src="https://cdn.ampproject.org/v0/amp-list-0.1.js"></script>
+      <!-- Import `amp-mustache` as a format template for `amp-list` -->
+      <script async custom-template="amp-mustache" src="https://cdn.ampproject.org/v0/amp-mustache-0.2.js"></script>
+      <!-- Import `amp-analytics` for tracking usage -->
+      <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
+      <!-- Import `amp-ad` to display ads -->
+      <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+
+      
+      <script type="application/ld+json">
+{
+      "@context": "http://schema.org",
+      "@type": "NewsArticle",
+      "mainEntityOfPage": "https://amp.dev/samples_templates/news_article/",
+      "headline": "Lorem Ipsum",
+      "datePublished": "2016-04-21T11:55:02Z",
+      "dateModified": "2016-04-21T11:55:02Z",
+      "description": "A sample news article build with AMP.",
+      "author": {
+        "@type": "Person",
+        "name": "Sebastian Benz"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Google",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "http://cdn.ampproject.org/logo.jpg",
+          "width": 600,
+          "height": 60
+        }
+      },
+      "image": {
+        "@type": "ImageObject",
+        "url": "/static/samples/img/landscape_lake_1280x857.jpg",
+        "height": 1280,
+        "width": 857
+      }
+    }
+  </script>
   
-    <style amp-custom>
-    :root {
-      --color-secondary: #00DCC0;
-    }
-    .amp-flying-carpet-text-border {
-      background-color: black;
-      color: white;
-      text-align: center;
-    }
-    .viewport-100 {
-      height: 100vh;
-      background-color: var(--color-secondary);
-    }
-    </style>
+  <style amp-custom>
+        :root {
+          --color-primary: #005AF0;
+          --color-text-light: #fff;
+          --color-text-dark: #000;
+          --color-bg-light: #FAFAFC;
 
-    </head>
-    <body>
+          --space-1: .5rem;  /* 8px */
+          --space-2: 1rem;   /* 16px */
+
+          --space-1: .5rem;  /* 8px */
+          --space-2: 1rem;   /* 16px */
+
+          --box-shadow-1: 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 1px -1px rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);
+          }
+          .figure {
+            margin: var(--space-2) 0;
+            padding: 0;
+          }
+          .figure>figcaption{
+            padding: var(--space-1) var(--space-2);
+          }
+          .amp-ad-container {
+            display: flex;
+            margin: 0 auto;
+          }
+          .carousel .slide > amp-img > img {
+            object-fit: contain;
+          }
+          .heading {
+            padding-bottom: var(--space-1);
+          }
+          .heading h1 {
+            font-size: 3rem;
+            line-height: 3.5rem;
+            margin-bottom: var(--space-2);
+          }
+          .heading > #summary {
+            font-weight: 500;
+          }
+          .heading > small {
+            color: var(--color-primary);
+          }
+          .related {
+            background-color: var(--color-bg-light);
+            margin: var(--space-2);
+            display: flex;
+            color: var(--color-text-dark);
+            padding: 0;
+            box-shadow: var(--box-shadow-1);
+            text-decoration: none;
+          }
+          .related > span {
+            font-weight: 400;
+            margin: var(--space-1);
+          }
+          .related:hover {
+            background-color: var(--color-bg-light);
+          }
+          .cookie-disclaimer {
+            padding: var(--space-1);
+            background: var(--color-bg-light);
+            text-align: center;
+            color: var(--color-text-dark);
+            border-top: 1px solid var(--color-text-dark);
+          }
+        </style>
+
+</head>
+<body>
       <h1>Maliek News</h1>
-      <div class="viewport-100"></div>
-
-      <!--
-        `amp-fx-flying-carpet` elements must be positioned after the first viewport so make sure to place enough content before the element to cover the targeted viewport sizes. The box that follows is to ensure that the `amp-fx-flying-carpet` is placed after the first viewport.
-
-        <div class="viewport-100"></div>
-
-        ## Flying carpet for ads
-
-        `amp-fx-flying-carpet` can be used to display ads. Use the `height` parameter to specify the height of the flying carpets "window".
-      -->
 
       <div>
         <div class="amp-flying-carpet-text-border">Advertising</div>
@@ -61,8 +154,102 @@
         <div class="amp-flying-carpet-text-border">Advertising</div>
       </div>
 
+      <div class="viewport-100"></div>
+
+      <!--
+        `amp-fx-flying-carpet` elements must be positioned after the first viewport so make sure to place enough content before the element to cover the targeted viewport sizes. The box that follows is to ensure that the `amp-fx-flying-carpet` is placed after the first viewport.
+
+        <div class="viewport-100"></div>
+
+        ## Flying carpet for ads
+
+        `amp-fx-flying-carpet` can be used to display ads. Use the `height` parameter to specify the height of the flying carpets "window".
+      -->
+
+  <!-- ## Basic usage -->
+  <!--
+    `amp-ad` requires `width` and `height` values. Select an ad network via the type argument.
+  -->
+  <amp-ad width="300" height="250" type="a9" data-amzn_assoc_ad_mode="auto" data-divid="amzn-assoc-ad-fe746097-f142-4f8d-8dfb-45ec747632e5" data-recomtype="async" data-adinstanceid="fe746097-f142-4f8d-8dfb-45ec747632e5">
+  </amp-ad>
+
+  <!-- ## Placeholder -->
+  <!--
+    Optionally `amp-ad` supports a child element with the `placeholder` attribute. If supported by the ad network, this element is shown until the ad is available for viewing.
+  -->
+  <amp-ad width="300" height="200" type="doubleclick" data-slot="/4119129/doesnt-exist">
+    <div placeholder>
+      <b>Placeholder here!!!</b>
+    </div>
+  </amp-ad>
+
+  <!-- ## Fallback -->
+  <!--
+    `amp-ad` supports a child element with the `fallback` attribute. If supported by the ad network, this element is shown if no ad is available for this slot.
+  -->
+  <amp-ad width="300" height="200" type="doubleclick" data-slot="/4119129/doesnt-exist">
+    <div fallback>
+      <p>Thank you for trying AMP!</p>
+      <p>You got lucky! We have no ad to show to you!</p>
+    </div>
+  </amp-ad>
 
 
+
+
+
+
+</body></html>
+
+
+
+
+
+ <!-- -->
+  <!doctype html>
+  <html ⚡ lang="en">
+    <head>
+     <meta charset="utf-8">
+     <title>Maliek News</title>
+     <script async src="https://cdn.ampproject.org/v0.js"></script>
+      <!-- ## Setup -->
+      <!-- Import the `amp-fx-flying-carpet` component in the header. -->
+    <script async custom-element="amp-fx-flying-carpet" src="https://cdn.ampproject.org/v0/amp-fx-flying-carpet-0.1.js"></script>
+    <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+    <meta name="viewport" content="width=device-width">
+
+    <link rel="canonical" href="<% canonical %>">
+    
+    <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
+  
+    
+    :root {
+      --color-secondary: #00DCC0;
+    }
+    .amp-flying-carpet-text-border {
+      background-color: black;
+      color: white;
+      text-align: center;
+    }
+    .viewport-100 {
+      height: 100vh;
+      background-color: var(--color-secondary);
+    }
+    </style>
+
+    </head>
+    <body>
+      
+      
+      
+      <div>
+        <div class="amp-flying-carpet-text-border">Advertising</div>
+        <amp-fx-flying-carpet height="300px">
+
+          
+        </amp-fx-flying-carpet>
+        <div class="amp-flying-carpet-text-border">Advertising</div>
+      </div>
      
 
       
