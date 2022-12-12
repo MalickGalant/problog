@@ -5,209 +5,39 @@
   <script src="https://accounts.google.com/gsi/client"></script>
   <meta name="amp-experiments-opt-in" content="experiment-a,experiment-b"> <!-- The meta tag needs to be placed before the AMP runtime script.-->
   <script async src="https://cdn.ampproject.org/v0.js"></script> 
-
-  <style>
-    #credential_picker_container {
-      position: fixed !important;
-      right: 0 !important;
-      top: 0 !important;
-    }
-  </style>
+  <style> body { margin: 0; } .url { /* * This is to make sure the URL div does not grow in height and causes issues * to scrolling related tests */ white-space: nowrap; overflow: hidden; } </style>
+  
 
   <script>
-    /** @const {string} */
-    const ATTRIBUTE_DONE_CALLBACK = 'data-done-callback';
-    const ALLOWED_ORIGINS = [
-      'https://www.googleapis.com/auth/adsense',
-      'https://problog.vercel.app'
-    ];
-    let messageListenerRegistered = false;
-    let pendingNonce = null;
-    let domainVerifiedCallback = null;
-    let responseReturned = false;
+    /* eslint-disable local/html-template */ const {html} = require('./app-index/html'); const SCRIPT = ` /** * @license * Copyright (c) 2016 The Polymer Project Authors. All rights reserved. * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt * Code distributed by Google as part of the polymer project is also * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt */ 'use strict'; { customElements.define('amp-viewer', class AmpViewerElement extends HTMLElement { constructor() { super(); if (!window.AMP_SHADOW) { window.AMP_SHADOW = true; this._installScript( 'https://cdn.ampproject.org/shadow-v0.js'); } this._amp = null; this._src = ''; this._host = null; } static get observedAttributes() { return ['src']; } set src(src) { if (this._src === src) { return; } this._src = src; this._clear(); if (!src) { this.removeAttribute('src'); } else { this.setAttribute('src', src); this._loadDocument(src); } } get src() { return this._src; } attributeChangedCallback(name, old, value) { if (old !== value) this.src = value; } _setVisibilityState(state) { if (this._amp) { this._amp._setVisibilityState(state); } } _clear() { if (this._amp) { this._amp.close(); this._amp = null; } if (this._host) { this.removeChild(this._host); this._host = null; } } _loadDocument(src) { this._fetchDocument(src, function (doc) { (window.AMP = window.AMP || []).push(function (AMP) { this._host = window.document.createElement('div'); this._host.classList.add('amp-doc-host'); this.appendChild(this._host); this._amp = AMP.attachShadowDoc(this._host, doc, src); }.bind(this)); }.bind(this)); } _installScript(src) { var ownerDoc = this.ownerDocument; var el = ownerDoc.createElement('script'); el.setAttribute('src', src); ownerDoc.head.appendChild(el); } _fetchDocument(src, callback) { var xhr = new XMLHttpRequest(); xhr.open('GET', src, true); xhr.responseType = 'document'; xhr.setRequestHeader('Accept', 'text/html'); xhr.onreadystatechange = function () { if (xhr.readyState < /* STATUS_RECEIVED */ 2) { return; } if (xhr.status < 100 || xhr.status > 599) { xhr.onreadystatechange = null; throw new Error(\`Unknown HTTP status \${xhr.status}\`); return; } if (xhr.readyState == /* COMPLETE */ 4) { if (xhr.responseXML) { callback(xhr.responseXML); } else { throw new Error('No xhr.responseXML'); } } }; xhr.onerror = function () { throw new Error('Network failure') }; xhr.onabort = function () { throw new Error('Request aborted') }; xhr.send(); } }); }; `; const renderShadowViewer = ({baseHref, src}) => html` 
+    <!DOCTYPE html> 
+    <html>
+    <head>
+    <base href="${baseHref}" />
+    <title>Maliek Viewer</title>
+    <script> ${SCRIPT}; </script> 
+    </head> 
+    <body style="padding: 0; margin: 0">
+    <amp-viewer src="${src}"></amp-viewer>
+   </body> 
+  </html> `;
+   module.exports = {renderShadowViewer};
 
-    function generateRandom() {
-      return btoa((Math.floor(Math.random() * 100000) + 1) + '-nonce');
-    }
-
-    function notifyParent(message) {
-      window.parent && window.parent.postMessage(message, '*');
-    }
-
-    function registerDomainVerifier(done) {
-      if (!window.parent) {
-        return;
-      }
-      domainVerifiedCallback = done;
-      if (!messageListenerRegistered) {
-        window.addEventListener('message', (event) => {
-
-          if (event.source != window.parent || !event.data) {
-            return;
-          }
-          if (!pendingNonce || !domainVerifiedCallback) {
-            return;
-          }
-          if (event.data['sentinel'] != 'onetap_google' || event.data['command'] != 'parent_frame_ready') {
-            return;
-          }
-          if (!event.data['nonce'] || event.data['nonce'] != pendingNonce) {
-            return;
-          }
-          pendingNonce = null;
-          if (ALLOWED_ORIGINS.includes(event.origin)) {
-            let callback = /** typeof {function} */ (domainVerifiedCallback);
-            domainVerifiedCallback = null;
-            callback();
-          }
-        });
-      }
-    }
-
-    function requestDomainVerification() {
-      pendingNonce = generateRandom();
-      notifyParent({
-        sentinel: 'onetap_google',
-        command: 'intermediate_iframe_ready',
-        nonce: pendingNonce
-      });
-    }
-
-    function notifyParentResize(height) {
-      notifyParent({
-        sentinel: 'onetap_google',
-        command: 'intermediate_iframe_resize',
-        height: height
-      });
-    }
-
-    function notifyParentClose() {
-      notifyParent({
-        sentinel: 'onetap_google',
-        command: 'intermediate_iframe_close'
-      });
-    }
-
-    function notifyParentDone() {
-      notifyParent({
-        sentinel: 'onetap_google',
-        command: 'intermediate_iframe_done'
-      });
-    }
-
-    function notifyParentUiMode(mode) {
-      notifyParent({
-        sentinel: 'onetap_google',
-        command: 'set_ui_mode',
-        mode: mode
-      });
-    }
-
-    function notifyParentTapOutsideMode(cancel) {
-      notifyParent({
-        sentinel: 'onetap_google',
-        command: 'set_tap_outside_mode',
-        cancel: !!cancel
-      });
-    }
-
-    function getHeight(detail) {
-      for (let p in detail) {
-        if (p == 'oldHeight') continue;
-        let height = detail[p];
-        if (typeof height === 'number' && !isNaN(height) && height > 0) {
-          return height;
-        }
-      }
-      return -1;
-    }
-
-
-    function formPost(url, data) {
-      const form = /** @type {!HTMLFormElement} */ (document.createElement('form'));
-      document.body.appendChild(form);
-      form.method = 'post';
-      form.action = url;
-      if (data) {
-        Object.keys(data).map(function (name) {
-          let input = /** @type {!HTMLInputElement} */ (
-            document.createElement('input'));
-          input.type = 'hidden';
-          input.name = name;
-          input.value = data[name];
-          form.appendChild(input);
-        });
-      }
-      form.submit();
-    }
-
-    function notifyParentHideOrClose() {
-      if (responseReturned) {
-        notifyParentResize(0);
-      } else {
-        notifyParentClose();
-      }
-    }
-
-    function resizeHandler(activity) {
-      if (activity.type == 'ui_change') {
-        let uiActivityType = /** @type {string} */ (activity['uiActivityType']);
-        if (!uiActivityType) {
-          return;
-        }
-        switch (uiActivityType) {
-          case 'prompt_closed':
-            notifyParentHideOrClose();
-            break;
-          case 'prompt_resized':
-            let height = activity['detail'] && getHeight(activity['detail']);
-            if (typeof height === 'number' && !isNaN(height) && height > 0) {
-              // resize
-              notifyParentResize(height);
-            }
-            break;
-          default:
-          // Do nothing.
-        }
-      }
-    }
-
-    function loginDemo(response) {
-      if (!response || !response['credential']) return;
-      responseReturned = true;
-      formPost('https://problog.vercel.app/login', response);
-    }
-
-    let displayOneTap = () => {
-      let isMobile = /iPhone|Android/i.test(navigator.userAgent);
-      let mode = isMobile ? 'bottom_sheet' : 'card';
-      notifyParentUiMode(mode);
-
-      let cancelOnTapOutside = true;
-      notifyParentTapOutsideMode(cancelOnTapOutside);
-      // notifyParentTapOutsideMode(false) after User interaction.
-
-      google.accounts.id.initialize({
-        client_id: '398767091896-jh7fevoq083ptli7cfk3pvlaak9eq12m.apps.googleusercontent.com',
-        callback: login,
-        auto_select: true,
-        cancel_on_tap_outside: cancelOnTapOutside,
-        activity_listener: resizeHandler,
-      });
-      google.accounts.id.prompt();
-    };
-
-    window.onload = () => {
-      registerDomainVerifier(displayOneTap);
-      requestDomainVerification();
-    };
   </script>
 
 </head>
 
 <body style="margin: 0; border: 0;">
 
+<h1 id="title">IEnvelope</h1>
 
+<div class="url">url: AD_URL</div>
+<div>size: AD_WIDTHxAD_HEIGHT</div> 
+<div style="background: #eee; overflow: hidden;; height: OFFSET;">scroll down to see the ad</div>
+<iframe id="inabox-frame" name="NAME" src="SOURCE" SRCDOC_ATTRIBUTE width="AD_WIDTH" height="AD_HEIGHT" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" data-amp-allowed="send-positions,full-overlay-frame,cancel-full-overlay-frame"> </iframe> 
+<div style="background: #eee; overflow: hidden;; height: 100vh;"></div> 
+
+INABOX_ADS_TAG_INTEGRATION
 
 
 
