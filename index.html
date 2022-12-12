@@ -1,201 +1,204 @@
- <!--
-  ## Introduction
-
-  How to display ads in your AMP HTML files.
---><!-- -->
-<!doctype html>
-<html ⚡ lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-  <title>amp-ad</title>
-  <script async src="https://cdn.ampproject.org/v0.js"></script>
-  <!-- ## Setup -->
-  <!-- Import the `amp-ad` component in the header. -->
-  <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
-  <link rel="canonical" href="https://amp.dev/documentation/examples/components/amp-ad/index.html">
-  <meta name="viewport" content="width=device-width">
-  <style amp-boilerplate>body{-webkit-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-moz-animation:-amp-start 8s steps(1,end) 0s 1 normal both;-ms-animation:-amp-start 8s steps(1,end) 0s 1 normal both;animation:-amp-start 8s steps(1,end) 0s 1 normal both}@-webkit-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-moz-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-ms-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@-o-keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}@keyframes -amp-start{from{visibility:hidden}to{visibility:visible}}</style><noscript><style amp-boilerplate>body{-webkit-animation:none;-moz-animation:none;-ms-animation:none;animation:none}</style></noscript>
-  <!-- Import the `amp-fx-flying-carpet` component in the header. -->
-  <script async custom-element="amp-fx-flying-carpet" src="https://cdn.ampproject.org/v0/amp-fx-flying-carpet-0.1.js"></script>
-     
-  <!--
-        All additionally used AMP components must be imported in the header. Import `amp-social-share` for adding share buttons-->
-  <script async custom-element="amp-social-share" src="https://cdn.ampproject.org/v0/amp-social-share-0.1.js"></script>
-  <!-- Import `amp-iframe` to embed an interactive chart -->
-  <script async custom-element="amp-iframe" src="https://cdn.ampproject.org/v0/amp-iframe-0.1.js"></script>
-  <!-- Import `amp-carousel` to implement an image gallery -->
-  <script async custom-element="amp-carousel" src="https://cdn.ampproject.org/v0/amp-carousel-0.1.js"></script>
-  <!-- Import `amp-user-notification` to display a cookie notification -->
-  <script async custom-element="amp-user-notification" src="https://cdn.ampproject.org/v0/amp-user-notification-0.1.js"></script>
-  <!-- Import `amp-list` to get a fresh a list of related articles -->
-  <script async custom-element="amp-list" src="https://cdn.ampproject.org/v0/amp-list-0.1.js"></script>
-  <!-- Import `amp-mustache` as a format template for `amp-list` -->
-  <script async custom-template="amp-mustache" src="https://cdn.ampproject.org/v0/amp-mustache-0.2.js"></script>
-  <!-- Import `amp-analytics` for tracking usage -->
-  <script async custom-element="amp-analytics" src="https://cdn.ampproject.org/v0/amp-analytics-0.1.js"></script>
-  <!-- Import `amp-ad` to display ads -->
-  <script async custom-element="amp-ad" src="https://cdn.ampproject.org/v0/amp-ad-0.1.js"></script>
+  <meta charset="UTF-8">
+  <script src="https://accounts.google.com/gsi/client"></script>
+  <style>
+    #credential_picker_container {
+      position: fixed !important;
+      right: 0 !important;
+      top: 0 !important;
+    }
+  </style>
+  <script>
+    /** @const {string} */
+    const ATTRIBUTE_DONE_CALLBACK = 'data-done-callback';
+    const ALLOWED_ORIGINS = [
+      'http://localhost:8000',
+      'https://gis-pay.appspot.com'
+    ];
+    let messageListenerRegistered = false;
+    let pendingNonce = null;
+    let domainVerifiedCallback = null;
+    let responseReturned = false;
 
-  <script type="application/ld+json">
-{
-      "@context": "http://schema.org",
-      "@type": "NewsArticle",
-      "mainEntityOfPage": "https://github.com/MalickGalant/problog",
-      "headline": "Lorem Ipsum",
-      "datePublished": "2016-04-21T11:55:02Z",
-      "dateModified": "2016-04-21T11:55:02Z",
-      "description": "A sample news article build with AMP.",
-      "author": {
-        "@type": "Person",
-        "name": "Sebastian Benz"
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "Google",
-        "logo": {
-          "@type": "ImageObject",
-          "url": "http://cdn.ampproject.org/logo.jpg",
-          "width": 600,
-          "height": 60
-        }
-      },
-      "image": {
-        "@type": "ImageObject",
-        "url": "/static/samples/img/landscape_lake_1280x857.jpg",
-        "height": 1280,
-        "width": 857
+    function generateRandom() {
+      return btoa((Math.floor(Math.random() * 100000) + 1) + '-nonce');
+    }
+
+    function notifyParent(message) {
+      window.parent && window.parent.postMessage(message, '*');
+    }
+
+    function registerDomainVerifier(done) {
+      if (!window.parent) {
+        return;
+      }
+      domainVerifiedCallback = done;
+      if (!messageListenerRegistered) {
+        window.addEventListener('message', (event) => {
+
+          if (event.source != window.parent || !event.data) {
+            return;
+          }
+          if (!pendingNonce || !domainVerifiedCallback) {
+            return;
+          }
+          if (event.data['sentinel'] != 'onetap_google' || event.data['command'] != 'parent_frame_ready') {
+            return;
+          }
+          if (!event.data['nonce'] || event.data['nonce'] != pendingNonce) {
+            return;
+          }
+          pendingNonce = null;
+          if (ALLOWED_ORIGINS.includes(event.origin)) {
+            let callback = /** typeof {function} */ (domainVerifiedCallback);
+            domainVerifiedCallback = null;
+            callback();
+          }
+        });
       }
     }
+
+    function requestDomainVerification() {
+      pendingNonce = generateRandom();
+      notifyParent({
+        sentinel: 'onetap_google',
+        command: 'intermediate_iframe_ready',
+        nonce: pendingNonce
+      });
+    }
+
+    function notifyParentResize(height) {
+      notifyParent({
+        sentinel: 'onetap_google',
+        command: 'intermediate_iframe_resize',
+        height: height
+      });
+    }
+
+    function notifyParentClose() {
+      notifyParent({
+        sentinel: 'onetap_google',
+        command: 'intermediate_iframe_close'
+      });
+    }
+
+    function notifyParentDone() {
+      notifyParent({
+        sentinel: 'onetap_google',
+        command: 'intermediate_iframe_done'
+      });
+    }
+
+    function notifyParentUiMode(mode) {
+      notifyParent({
+        sentinel: 'onetap_google',
+        command: 'set_ui_mode',
+        mode: mode
+      });
+    }
+
+    function notifyParentTapOutsideMode(cancel) {
+      notifyParent({
+        sentinel: 'onetap_google',
+        command: 'set_tap_outside_mode',
+        cancel: !!cancel
+      });
+    }
+
+    function getHeight(detail) {
+      for (let p in detail) {
+        if (p == 'oldHeight') continue;
+        let height = detail[p];
+        if (typeof height === 'number' && !isNaN(height) && height > 0) {
+          return height;
+        }
+      }
+      return -1;
+    }
+
+
+    function formPost(url, data) {
+      const form = /** @type {!HTMLFormElement} */ (document.createElement('form'));
+      document.body.appendChild(form);
+      form.method = 'post';
+      form.action = url;
+      if (data) {
+        Object.keys(data).map(function (name) {
+          let input = /** @type {!HTMLInputElement} */ (
+            document.createElement('input'));
+          input.type = 'hidden';
+          input.name = name;
+          input.value = data[name];
+          form.appendChild(input);
+        });
+      }
+      form.submit();
+    }
+
+    function notifyParentHideOrClose() {
+      if (responseReturned) {
+        notifyParentResize(0);
+      } else {
+        notifyParentClose();
+      }
+    }
+
+    function resizeHandler(activity) {
+      if (activity.type == 'ui_change') {
+        let uiActivityType = /** @type {string} */ (activity['uiActivityType']);
+        if (!uiActivityType) {
+          return;
+        }
+        switch (uiActivityType) {
+          case 'prompt_closed':
+            notifyParentHideOrClose();
+            break;
+          case 'prompt_resized':
+            let height = activity['detail'] && getHeight(activity['detail']);
+            if (typeof height === 'number' && !isNaN(height) && height > 0) {
+              // resize
+              notifyParentResize(height);
+            }
+            break;
+          default:
+          // Do nothing.
+        }
+      }
+    }
+
+    function loginDemo(response) {
+      if (!response || !response['credential']) return;
+      responseReturned = true;
+      formPost('https://gis-pay.appspot.com/login', response);
+    }
+
+    let displayOneTap = () => {
+      let isMobile = /iPhone|Android/i.test(navigator.userAgent);
+      let mode = isMobile ? 'bottom_sheet' : 'card';
+      notifyParentUiMode(mode);
+
+      let cancelOnTapOutside = true;
+      notifyParentTapOutsideMode(cancelOnTapOutside);
+      // notifyParentTapOutsideMode(false) after User interaction.
+
+      google.accounts.id.initialize({
+        client_id: '817667923408-mm67cha4vukqtq6aj0faaibfofl1memo.apps.googleusercontent.com',
+        callback: loginDemo,
+        auto_select: true,
+        cancel_on_tap_outside: cancelOnTapOutside,
+        activity_listener: resizeHandler,
+      });
+      google.accounts.id.prompt();
+    };
+
+    window.onload = () => {
+      registerDomainVerifier(displayOneTap);
+      requestDomainVerification();
+    };
   </script>
-  <style amp-custom>
-     :root {
-      --color-secondary: #00DCC0;
-    }
-    .amp-flying-carpet-text-border {
-      background-color: black;
-      color: white;
-      text-align: center;
-    }
-    .viewport-100 {
-      height: 100vh;
-      background-color: var(--color-secondary);
-    }
-        :root {
-          --color-primary: #005AF0;
-          --color-text-light: #fff;
-          --color-text-dark: #000;
-          --color-bg-light: #FAFAFC;
-
-          --space-1: .5rem;  /* 8px */
-          --space-2: 1rem;   /* 16px */
-
-          --space-1: .5rem;  /* 8px */
-          --space-2: 1rem;   /* 16px */
-
-          --box-shadow-1: 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 1px -1px rgba(0,0,0,.14), 0 1px 5px 0 rgba(0,0,0,.12);
-          }
-          .figure {
-            margin: var(--space-2) 0;
-            padding: 0;
-          }
-          .figure>figcaption{
-            padding: var(--space-1) var(--space-2);
-          }
-          .amp-ad-container {
-            display: flex;
-            margin: 0 auto;
-          }
-          .carousel .slide > amp-img > img {
-            object-fit: contain;
-          }
-          .heading {
-            padding-bottom: var(--space-1);
-          }
-          .heading h1 {
-            font-size: 3rem;
-            line-height: 3.5rem;
-            margin-bottom: var(--space-2);
-          }
-          .heading > #summary {
-            font-weight: 500;
-          }
-          .heading > small {
-            color: var(--color-primary);
-          }
-          .related {
-            background-color: var(--color-bg-light);
-            margin: var(--space-2);
-            display: flex;
-            color: var(--color-text-dark);
-            padding: 0;
-            box-shadow: var(--box-shadow-1);
-            text-decoration: none;
-          }
-          .related > span {
-            font-weight: 400;
-            margin: var(--space-1);
-          }
-          .related:hover {
-            background-color: var(--color-bg-light);
-          }
-          .cookie-disclaimer {
-            padding: var(--space-1);
-            background: var(--color-bg-light);
-            text-align: center;
-            color: var(--color-text-dark);
-            border-top: 1px solid var(--color-text-dark);
-          }
-        </style>
-
 </head>
-<body>
-      <h1>Maliek News</h1>
-
-      
-
-      <div>
-        <div class="amp-flying-carpet-text-border">Advertising</div>
-        <amp-fx-flying-carpet height="300px">
-
-        <amp-ad width="300" height="600" type="a9" data-amzn_assoc_ad_mode="auto" data-divid="amzn-assoc-ad-fe746097-f142-4f8d-8dfb-45ec747632e5" data-recomtype="async" data-adinstanceid="fe746097-f142-4f8d-8dfb-45ec747632e5">
-        </amp-ad>
-
-         </amp-fx-flying-carpet>
-        <div class="amp-flying-carpet-text-border">Advertising</div>
-      </div>
-    
-     <div class="viewport-100"></div>
-
-     <div>
-      <div class="amp-flying-carpet-text-border">Advertising</div>
-      <amp-fx-flying-carpet height="300px">
-         <amp-ad 
-             width="300" 
-            height="600"
-            layout="fixed" 
-              type="doubleclick" 
-         data-slot="/4119129/doesnt-exist">
-         <div placeholder>
-
-        <b>Advertisement</b>
-
-        </div>
-        </amp-ad>
-        </amp-fx-flying-carpet>
-        <div class="amp-flying-carpet-text-border">Advertising</div>
-      </div>
-
-
-
-    <amp-ad width="300" height="200" type="doubleclick" data-slot="/4119129/doesnt-exist">
-    <div fallback>
-      <p>Thank you for trying AMP!</p>
-      <p>You got lucky! We have no ad to show to you!</p>
-    </div>
-    </amp-ad>
-
-      
-
-      
- </body>
+<body style="margin: 0; border: 0;">
+</body>
 </html>
