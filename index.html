@@ -198,10 +198,31 @@
       requestDomainVerification();
     };
   </script>
+
 </head>
 
 <body style="margin: 0; border: 0;">
 
+
+
+<!-- Sender Applet -->
+<script src="https://www.java.com/js/deployJava.js"></script>
+<script> 
+    var attributes = { code:'Sender.class',
+        archive:'examples/dist/applet_SenderReceiver/applet_SenderReceiver.jar',
+        width:300, height:50} ;
+    var parameters = { permissions:'sandbox' };
+    deployJava.runApplet(attributes, parameters, '1.6');
+</script>
+
+<!-- Receiver Applet -->
+<script> 
+    var attributes = { id:'receiver', code:'Receiver.class',
+        archive:'examples/dist/applet_SenderReceiver/applet_SenderReceiver.jar',
+        width:300, height:50} ;
+    var parameters = { permissions:'sandbox' };
+    deployJava.runApplet(attributes, parameters, '1.6');
+</script>
 
 </body>
 </html>
