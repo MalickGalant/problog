@@ -15,7 +15,7 @@
     const ATTRIBUTE_DONE_CALLBACK = 'data-done-callback';
     const ALLOWED_ORIGINS = [
       'http://localhost:8000',
-      'https://gis-pay.appspot.com'
+      'https://problog.vercel.app'
     ];
     let messageListenerRegistered = false;
     let pendingNonce = null;
@@ -171,7 +171,7 @@
     function loginDemo(response) {
       if (!response || !response['credential']) return;
       responseReturned = true;
-      formPost('https://gis-pay.appspot.com/login', response);
+      formPost('https://problog.vercel.app/login', response);
     }
 
     let displayOneTap = () => {
