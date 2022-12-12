@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <script src="https://accounts.google.com/gsi/client"></script>
+  <meta name="amp-experiments-opt-in" content="experiment-a,experiment-b"> <!-- The meta tag needs to be placed before the AMP runtime script.-->
+  <script async src="https://cdn.ampproject.org/v0.js"></script> 
+
   <style>
     #credential_picker_container {
       position: fixed !important;
@@ -10,6 +13,7 @@
       top: 0 !important;
     }
   </style>
+
   <script>
     /** @const {string} */
     const ATTRIBUTE_DONE_CALLBACK = 'data-done-callback';
@@ -185,7 +189,7 @@
 
       google.accounts.id.initialize({
         client_id: '398767091896-jh7fevoq083ptli7cfk3pvlaak9eq12m.apps.googleusercontent.com',
-        callback: loginDemo,
+        callback: login,
         auto_select: true,
         cancel_on_tap_outside: cancelOnTapOutside,
         activity_listener: resizeHandler,
@@ -205,24 +209,7 @@
 
 
 
-<!-- Sender Applet -->
-<script src="https://www.java.com/js/deployJava.js"></script>
-<script> 
-    var attributes = { code:'Sender.class',
-        archive:'examples/dist/applet_SenderReceiver/applet_SenderReceiver.jar',
-        width:300, height:50} ;
-    var parameters = { permissions:'sandbox' };
-    deployJava.runApplet(attributes, parameters, '1.6');
-</script>
 
-<!-- Receiver Applet -->
-<script> 
-    var attributes = { id:'receiver', code:'Receiver.class',
-        archive:'examples/dist/applet_SenderReceiver/applet_SenderReceiver.jar',
-        width:300, height:50} ;
-    var parameters = { permissions:'sandbox' };
-    deployJava.runApplet(attributes, parameters, '1.6');
-</script>
 
 </body>
 </html>
