@@ -1,0 +1,52 @@
+{
+  "name": "owners",
+  "author": "Google Inc.",
+  "private": true,
+  "version": "0.0.1",
+  "repository": "http://github.com/MalickGalant/problog",
+  "description": "A web service that suggests approvers for a GitHub pull request based on OWNERS files and enforces reviews by OWNERS as a GitHub status check.",
+  "scripts": {
+    "init": "node scripts/warm_cache.js",
+    "dev": "node info_server.js",
+    "start": "probot run ./index.js",
+    "deploy-tag": "git tag 'deploy-owners-'`date -u '+%Y%m%d%H%M%S'`",
+    "test": "jest --reporters=jest-silent-reporter",
+    "test:watch": "jest --watch --notify --notifyMode=change"
+  },
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@google-cloud/storage": "5.16.0",
+    "@octokit/rest": "18.12.0",
+    "ajv": "8.8.2",
+    "express": "4.17.1",
+    "highlight": "0.2.4",
+    "json5": "2.2.0",
+    "lodash": "4.17.21",
+    "minimatch": "3.0.4",
+    "probot": "12.2.5",
+    "sleep-promise": "9.1.0"
+  },
+  "devDependencies": {
+    "jest": "27.4.0",
+    "jest-silent-reporter": "0.5.0",
+    "nock": "13.2.1",
+    "sinon": "12.0.1",
+    "smee-client": "1.2.3",
+    "supertest": "6.1.6"
+  },
+  "standard": {
+    "env": [
+      "jest"
+    ]
+  },
+  "nodemonConfig": {
+    "exec": "npm start",
+    "watch": [
+      ".env",
+      "."
+    ]
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
