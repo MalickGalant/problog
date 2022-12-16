@@ -1,34 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <script src="https://accounts.google.com/gsi/client"></script>
-  <meta name="amp-experiments-opt-in" content="experiment-a,experiment-b">
-  <!-- The meta tag needs to be placed before the AMP runtime script.-->
-  <script async src="https://cdn.ampproject.org/v0.js"></script>
-
-  <style> body { margin: 0; } .url { /* * This is to make sure the URL div does not grow in height and causes issues * to scrolling related tests */ white-space: nowrap; overflow: hidden; } </style>
-  
-
-  <script>
-    
-
-  </script>
-
-</head>
-
-<body style="margin: 0; border: 0;">
-
-<h1 id="title">IEnvelope</h1>
-
-<div class="url">https://malicmax.com</div>
-<div>size: AD_WIDTHxAD_HEIGHT</div> 
-<div style="background: #eee; overflow: hidden;; height: OFFSET;">scroll down to see the ad</div>
-<iframe id="inabox-frame" name="NAME" src="SOURCE" SRCDOC_ATTRIBUTE width="AD_WIDTH" height="AD_HEIGHT" scrolling="no" marginwidth="0" marginheight="0" frameborder="0" data-amp-allowed="send-positions,full-overlay-frame,cancel-full-overlay-frame"> </iframe> 
-<div style="background: #eee; overflow: hidden;; height: 100vh;"></div> 
-
-
-
-
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Hoverboard</title>
+  </head>
+  <body>
+    <div class="container" id="container"></div>
+    <script src="script.js"></script>
+  </body>
 </html>
