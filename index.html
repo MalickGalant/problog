@@ -1,17 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="https://musicappblog.firebaseapp.com/style.css" />
-    <title>Billboards</title>
+    <title>Google Tag Manager & automatic cookie blocking</title>
+
+    <!-- Google Consent Mode -->
+    <script data-cookieconsent="ignore">
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments)
+      }
+      gtag("consent", "default", {
+        ad_storage: "denied",
+        analytics_storage: "denied",
+        functionality_storage: "denied",
+        personalization_storage: "denied",
+        security_storage: "granted",
+        wait_for_update: 500
+      });
+      gtag("set", "ads_data_redaction", true);
+    </script>
+    <!-- End Google Consent Mode-->
+
+    <!-- Google Tag Manager -->
+    <script data-cookieconsent="ignore">
+    (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-XXXX');</script>
+    <!-- End Google Tag Manager -->
+
+    <!-- Cookiebot CMP-->
+    <script
+      id="Cookiebot"
+      src="https://consent.cookiebot.com/uc.js"
+      data-cbid="abcdef12-3456-7890-abcd-ef1234567890"
+      data-blockingmode="auto"
+      type="text/javascript"
+    ></script>
+    <!-- End Cookiebot CMP -->
+
+    ...
+
   </head>
   <body>
 
-
-    <div class="container" id="container"></div>
-    <script src="app-index/template.js"></script>
-
+    ...
 
   </body>
 </html>
